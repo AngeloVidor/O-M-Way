@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "zlIo7bu7aH/mDOl6SuwVwpgDwUUhx0INnt51xXxvDWE=",
+  "Source": "Transporter.Api",
+  "BasePath": "_content/Transporter.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
