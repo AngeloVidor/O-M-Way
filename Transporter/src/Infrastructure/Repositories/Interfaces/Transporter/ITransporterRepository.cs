@@ -9,5 +9,6 @@ namespace src.Infrastructure.Repositories.Interfaces
     public interface ITransporterRepository
     {
         Task<bool> AddAsync(TransporterCompany transporter);
+        Task UpdateLocationAsync(Location location);
     }
 }

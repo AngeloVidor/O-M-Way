@@ -8,6 +8,7 @@ using src.API.DTOs;
 using src.Application.Models;
 using src.Application.UseCases.CreateTransporter.Interfaces;
 using src.Application.UseCases.GenerateVerificationCode.Interfaces;
+using src.Application.UseCases.SendVerificationCodeToEmail.Interfaces;
 using src.Domain.Entities;
 using src.Infrastructure.Repositories.Interfaces;
 using src.Infrastructure.Repositories.Interfaces.VerificationCode;
@@ -20,13 +21,15 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
         private readonly ITransporterRepository _transporterRepository;
         private readonly IVerificationCodeHandler _verificationCode;
         private readonly IVerificationCodeRepository _verificationCodeRepository;
+        private readonly ISendVerificationCodeToEmailService _sendVerificationCodeToEmailService;
 
-        public TransporterService(IMapper mapper, ITransporterRepository transporterRepository, IVerificationCodeHandler verificationCode, IVerificationCodeRepository verificationCodeRepository)
+        public TransporterService(IMapper mapper, ITransporterRepository transporterRepository, IVerificationCodeHandler verificationCode, IVerificationCodeRepository verificationCodeRepository, ISendVerificationCodeToEmailService sendVerificationCodeToEmailService)
         {
             _mapper = mapper;
             _transporterRepository = transporterRepository;
             _verificationCode = verificationCode;
             _verificationCodeRepository = verificationCodeRepository;
+            _sendVerificationCodeToEmailService = sendVerificationCodeToEmailService;
         }
 
         public async Task<bool> AddAsync(TransporterCompanyDTO transporterCompanyDTO)
@@ -41,12 +44,17 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
                 CreatedAt = DateTime.Now,
                 ExpirationDate = DateTime.Now.AddMinutes(5)
             };
+            transporterEntity.Location.Transporter_ID = transporterCompanyDTO.Transporter_ID;
             await _verificationCodeRepository.SaveVerificationCodeAsync(verificationCode);
-            Console.WriteLine($"Verification code: {code}");
-            Console.WriteLine("Valid from " + verificationCode.CreatedAt + " to " + verificationCode.ExpirationDate);
             transporterEntity.VerificationCode_ID = verificationCode.VerificationCode_ID;
+            await _sendVerificationCodeToEmailService.SentAsync(transporterEntity.Email, verificationCode.Code, verificationCode.CreatedAt, verificationCode.ExpirationDate);
 
             var result = await _transporterRepository.AddAsync(transporterEntity);
+            if (result)
+            {
+                transporterEntity.Location.Transporter_ID = transporterEntity.Transporter_ID;
+                await _transporterRepository.UpdateLocationAsync(transporterEntity.Location);
+            }
             return result;
         }
     }

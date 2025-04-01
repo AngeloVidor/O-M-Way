@@ -85,7 +85,7 @@ namespace Transporter.Api.Migrations
 
                     b.HasKey("Location_ID");
 
-                    b.ToTable("Location");
+                    b.ToTable("Locations");
                 });
 
             modelBuilder.Entity("src.Domain.Entities.TransporterCompany", b =>
