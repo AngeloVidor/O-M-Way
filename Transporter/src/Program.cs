@@ -12,6 +12,8 @@ using src.Infrastructure.Repositories.Implementations.VerificationCode;
 using src.Infrastructure.Repositories.Interfaces;
 using src.Infrastructure.Repositories.Interfaces.VerificationCode;
 using DotNetEnv;
+using src.Application.UseCases.CheckZipCodeValidity.Implementations;
+using src.Application.UseCases.CheckZipCodeValidity.Interfaces;
 
 DotNetEnv.Env.Load();
 
@@ -37,6 +39,9 @@ builder.Services.AddScoped<IVerificationCodeRepository, VerificationCodeReposito
 builder.Services.AddScoped<IVerificationCodeHandler, VerificationCodeHandler>();
 builder.Services.AddScoped<ISendVerificationCodeToEmailService, SendVerificationCodeToEmailService>();
 builder.Services.AddScoped<MimeKit.MimeMessage>();
+builder.Services.AddScoped<IZipCodeValidityCheckerService, ZipCodeValidityCheckerService>();
+
+builder.Services.AddSingleton<HttpClient>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
