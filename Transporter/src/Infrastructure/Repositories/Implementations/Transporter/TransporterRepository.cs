@@ -18,34 +18,25 @@ namespace src.Infrastructure.Repositories.Implementations
             _dbContext = dbContext;
         }
 
-        public async Task<bool> AddAsync(TransporterCompany transporter)
+        public async Task<TransporterCompany> AddAsync(TransporterCompany transporter)
         {
             await _dbContext.Transporters.AddAsync(transporter);
-            int result = await _dbContext.SaveChangesAsync();
-            return result > 0;
+            await _dbContext.SaveChangesAsync();
+            return transporter;
         }
 
-        public async Task UpdateLocationAsync(Location location)
+        public async Task<Location> AddLocationAsync(Location location)
         {
-            var existingLocation = await _dbContext.Locations.FindAsync(location.Location_ID);
-            if (existingLocation != null)
-            {
-                existingLocation.Location_ID = location.Location_ID;
-                existingLocation.City = location.City;
-                existingLocation.State = location.State;
-                existingLocation.Country = location.Country;
-                existingLocation.Street = location.Street;
-                existingLocation.CEP = location.CEP;
-                existingLocation.Timestamp = location.Timestamp;
-                existingLocation.Transporter_ID = location.Transporter_ID;
-
-                _dbContext.Locations.Update(existingLocation);
-                await _dbContext.SaveChangesAsync();
-            }
-            else
-            {
-                throw new Exception("Location not found");
-            }
+            await _dbContext.Locations.AddAsync(location);
+            await _dbContext.SaveChangesAsync();
+            return location;
         }
+
+        public async Task UpdateAsync(TransporterCompany transporter)
+        {
+            _dbContext.Transporters.Update(transporter);
+            await _dbContext.SaveChangesAsync();
+        }
+
     }
 }

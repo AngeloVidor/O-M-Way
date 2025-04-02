@@ -18,6 +18,9 @@ namespace src.Infrastructure.Data
         public DbSet<TransporterCompany> Transporters { get; set; }
         public DbSet<VerificationCodeModel> VerificationCodes { get; set; }
         public DbSet<Location> Locations { get; set; }
+        public DbSet<PendingRegistration> TransporterPreRegistrations { get; set; }
+        public DbSet<PendingLocation> PendingLocations { get; set; }
+
 
 
     }

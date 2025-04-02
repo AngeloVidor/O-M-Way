@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using src.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using src.Infrastructure.Data;
 namespace Transporter.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250402081518_AddingVerificationCodeIntoPendingRegistrationTable")]
+    partial class AddingVerificationCodeIntoPendingRegistrationTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,8 +87,6 @@ namespace Transporter.Api.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Location_ID");
-
-                    b.HasIndex("Transporter_ID");
 
                     b.ToTable("Locations");
                 });
@@ -193,7 +194,7 @@ namespace Transporter.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("Location_ID")
+                    b.Property<long>("Location_ID")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Name")
@@ -208,22 +209,16 @@ namespace Transporter.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("VerificationCode_ID")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Transporter_ID");
 
                     b.HasIndex("Location_ID");
 
+                    b.HasIndex("VerificationCode_ID");
+
                     b.ToTable("Transporters");
-                });
-
-            modelBuilder.Entity("src.Domain.Entities.Location", b =>
-                {
-                    b.HasOne("src.Domain.Entities.TransporterCompany", "Transporter")
-                        .WithMany()
-                        .HasForeignKey("Transporter_ID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Transporter");
                 });
 
             modelBuilder.Entity("src.Domain.Entities.PendingRegistration", b =>
@@ -241,9 +236,19 @@ namespace Transporter.Api.Migrations
                 {
                     b.HasOne("src.Domain.Entities.Location", "Location")
                         .WithMany()
-                        .HasForeignKey("Location_ID");
+                        .HasForeignKey("Location_ID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("src.Application.Models.VerificationCodeModel", "VerificationCode")
+                        .WithMany()
+                        .HasForeignKey("VerificationCode_ID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Location");
+
+                    b.Navigation("VerificationCode");
                 });
 #pragma warning restore 612, 618
         }

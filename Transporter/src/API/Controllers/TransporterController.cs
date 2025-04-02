@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using src.API.DTOs;
 using src.Application.UseCases.CreateTransporter.Interfaces;
+using src.Domain.Entities;
 
 namespace src.API.Controllers
 {
@@ -19,8 +20,8 @@ namespace src.API.Controllers
             _transporterService = transporterService;
         }
 
-        [HttpPost("create")]
-        public async Task<IActionResult> AddAsync([FromBody] TransporterCompanyDTO transporterCompanyDTO)
+        [HttpPost("StartRegistration")]
+        public async Task<IActionResult> AddAsync([FromBody] PendingRegistration pendingRegistration)
         {
             if (!ModelState.IsValid)
             {
@@ -28,7 +29,21 @@ namespace src.API.Controllers
             }
             try
             {
-                var result = await _transporterService.AddAsync(transporterCompanyDTO);
+                var result = await _transporterService.StartRegistrationAsync(pendingRegistration);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost("EndRegistration")]
+        public async Task<IActionResult> EndRegistration(string verificationCode)
+        {
+            try
+            {
+                var result = await _transporterService.EndRegistrationAsync(verificationCode);
                 return Ok(result);
             }
             catch (Exception ex)

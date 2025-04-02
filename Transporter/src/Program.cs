@@ -16,6 +16,8 @@ using src.Application.UseCases.CheckZipCodeValidity.Implementations;
 using src.Application.UseCases.CheckZipCodeValidity.Interfaces;
 using src.Application.UseCases.ConsultCNPJ.Interfaces;
 using src.Application.UseCases.ConsultCNPJ.Imlementations;
+using src.Infrastructure.Repositories.Interfaces.TemporaryData;
+using src.Infrastructure.Repositories.Implementations.TemporaryData;
 
 DotNetEnv.Env.Load();
 
@@ -43,6 +45,7 @@ builder.Services.AddScoped<ISendVerificationCodeToEmailService, SendVerification
 builder.Services.AddScoped<MimeKit.MimeMessage>();
 builder.Services.AddScoped<IZipCodeValidityCheckerService, ZipCodeValidityCheckerService>();
 builder.Services.AddScoped<IConsultCnpjService, ConsultCnpjService>();
+builder.Services.AddScoped<ITransporterTemporaryDataRepository, TransporterTemporaryDataRepository>();
 
 builder.Services.AddSingleton<HttpClient>();
 

@@ -9,5 +9,6 @@ namespace src.Infrastructure.Repositories.Interfaces.VerificationCode
     public interface IVerificationCodeRepository
     {
         Task<bool> SaveVerificationCodeAsync(VerificationCodeModel verificationCodeModel);
+        Task<VerificationCodeModel> GetVerificationCodeAsync(string verificationCode);
     }
 }
