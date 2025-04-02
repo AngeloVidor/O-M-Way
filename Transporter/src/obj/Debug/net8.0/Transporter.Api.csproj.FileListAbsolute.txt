@@ -154,3 +154,4 @@ C:\Users\angel\Desktop\OmWay\Transporter\src\obj\Debug\net8.0\refint\Transporter
 C:\Users\angel\Desktop\OmWay\Transporter\src\obj\Debug\net8.0\Transporter.Api.pdb
 C:\Users\angel\Desktop\OmWay\Transporter\src\obj\Debug\net8.0\Transporter.Api.genruntimeconfig.cache
 C:\Users\angel\Desktop\OmWay\Transporter\src\obj\Debug\net8.0\ref\Transporter.Api.dll
+C:\Users\angel\Desktop\OmWay\Transporter\src\bin\Debug\net8.0\BCrypt.Net-Next.dll

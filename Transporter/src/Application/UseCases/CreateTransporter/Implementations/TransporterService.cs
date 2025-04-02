@@ -59,6 +59,8 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
             pendingRegistration.VerificationCode = response.Code;
 
             await _sendVerificationCodeToEmailService.SentAsync(pendingRegistration.Email, response.Code, response.CreatedAt, response.ExpirationDate);
+
+            pendingRegistration.Password = BCrypt.Net.BCrypt.HashPassword(pendingRegistration.Password);
             var temporaryData = await _transporterTemporaryDataRepository.AddTemporaryDataAsync(pendingRegistration);
             return temporaryData;
         }
