@@ -7,6 +7,7 @@ using AutoMapper;
 using src.API.DTOs;
 using src.Application.Models;
 using src.Application.UseCases.CheckZipCodeValidity.Interfaces;
+using src.Application.UseCases.ConsultCNPJ.Interfaces;
 using src.Application.UseCases.CreateTransporter.Interfaces;
 using src.Application.UseCases.GenerateVerificationCode.Interfaces;
 using src.Application.UseCases.SendVerificationCodeToEmail.Interfaces;
@@ -24,8 +25,9 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
         private readonly IVerificationCodeRepository _verificationCodeRepository;
         private readonly ISendVerificationCodeToEmailService _sendVerificationCodeToEmailService;
         private readonly IZipCodeValidityCheckerService _zipCodeValidityCheckerService;
+        private readonly IConsultCnpjService _consultCnpjService;
 
-        public TransporterService(IMapper mapper, ITransporterRepository transporterRepository, IVerificationCodeHandler verificationCode, IVerificationCodeRepository verificationCodeRepository, ISendVerificationCodeToEmailService sendVerificationCodeToEmailService, IZipCodeValidityCheckerService zipCodeValidityCheckerService)
+        public TransporterService(IMapper mapper, ITransporterRepository transporterRepository, IVerificationCodeHandler verificationCode, IVerificationCodeRepository verificationCodeRepository, ISendVerificationCodeToEmailService sendVerificationCodeToEmailService, IZipCodeValidityCheckerService zipCodeValidityCheckerService, IConsultCnpjService consultCnpjService)
         {
             _mapper = mapper;
             _transporterRepository = transporterRepository;
@@ -33,11 +35,18 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
             _verificationCodeRepository = verificationCodeRepository;
             _sendVerificationCodeToEmailService = sendVerificationCodeToEmailService;
             _zipCodeValidityCheckerService = zipCodeValidityCheckerService;
+            _consultCnpjService = consultCnpjService;
         }
 
         public async Task<bool> AddAsync(TransporterCompanyDTO transporterCompanyDTO)
         {
             var transporterEntity = _mapper.Map<TransporterCompany>(transporterCompanyDTO);
+
+            bool isValidCnpj = await _consultCnpjService.IsCnpjValidAsync(transporterEntity.CNPJ);
+            if (!isValidCnpj)
+            {
+                throw new ArgumentException("Invalid or inactive CNPJ. It must contain exactly 14 digits.");
+            }
 
             bool isValidZipCode = await _zipCodeValidityCheckerService.IsValidZipCodeAsync(transporterEntity.Location.CEP);
             if (!isValidZipCode)

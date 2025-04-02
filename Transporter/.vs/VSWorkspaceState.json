@@ -1,8 +1,14 @@
 {
   "ExpandedNodes": [
     "",
-    "\\tests"
+    "\\src",
+    "\\src\\Application",
+    "\\src\\Application\\UseCases",
+    "\\src\\Application\\UseCases\\CheckZipCodeValidity",
+    "\\src\\Application\\UseCases\\CheckZipCodeValidity\\Implementations",
+    "\\src\\Application\\UseCases\\CreateTransporter",
+    "\\src\\Application\\UseCases\\CreateTransporter\\Implementations"
   ],
-  "SelectedNode": "\\src",
+  "SelectedNode": "\\src\\Transporter.Api.csproj",
   "PreviewInSolutionExplorer": false
 }

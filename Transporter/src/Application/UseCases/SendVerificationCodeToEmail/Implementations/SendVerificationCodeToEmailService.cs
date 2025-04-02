@@ -25,12 +25,12 @@ namespace src.Application.UseCases.SendVerificationCodeToEmail.Implementations
             var appPassword = _configuration["OM_WAY_EMAIL_PASSWORD"];
             if (string.IsNullOrEmpty(fromEmail))
             {
-                throw new InvalidOperationException("O endereço de e-mail do remetente não está configurado.");
+                throw new InvalidOperationException("The sender's email address is not configured.");
             }
 
             if (string.IsNullOrEmpty(email))
             {
-                throw new InvalidOperationException("O e-mail do destinatário não pode ser nulo ou vazio.");
+                throw new InvalidOperationException("The recipient's email cannot be null or empty.");
             }
 
             _message.From.Add(new MailboxAddress("OmWay", fromEmail));
