@@ -22,6 +22,12 @@ using src.Application.UseCases.AuthenticateTransporter.Interfaces;
 using src.Application.UseCases.AuthenticateTransporter.Implementations;
 using src.Infrastructure.Repositories.Interfaces.Utility;
 using src.Infrastructure.Repositories.Implementations.Utility;
+using src.Application.Security.Interface;
+using src.Application.Security.Implementation;
+using src.Application.Security.Model;
+using Microsoft.OpenApi.Models;
+using src.Application.UseCases.Utility.Interfaces;
+using src.Application.UseCases.Utility.Implementations;
 
 DotNetEnv.Env.Load();
 
@@ -32,13 +38,43 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
+    c.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Description = "Enter JWT token in format: Bearer {your_token}",
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "Bearer"
+        }
+    );
+
+    c.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                new string[] { }
+            }
+        }
+    );
+});
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-
 
 
 builder.Services.AddScoped<ITransporterRepository, TransporterRepository>();
@@ -52,10 +88,21 @@ builder.Services.AddScoped<IConsultCnpjService, ConsultCnpjService>();
 builder.Services.AddScoped<ITransporterTemporaryDataRepository, TransporterTemporaryDataRepository>();
 builder.Services.AddScoped<IAuthenticateTransporterService, AuthenticateTransporterService>();
 builder.Services.AddScoped<IUtilityRepository, UtilityRepository>();
+builder.Services.AddScoped<IUtilityService, UtilityService>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
+var jwtDurationStr = Environment.GetEnvironmentVariable("JWT_DURATION");
+var jwtDuration = string.IsNullOrEmpty(jwtDurationStr) ? 30 : int.Parse(jwtDurationStr);
 
+var jwtConfig = new JwtModel
+{
+    JWT_KEY = Environment.GetEnvironmentVariable("JWT_KEY"),
+    JWT_ISSUER = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+    JWT_AUDIENCE = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+    JWT_DurationInMinutes = jwtDuration
+};
+builder.Services.AddSingleton(jwtConfig);
 builder.Services.AddSingleton<HttpClient>();
-
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
