@@ -5,16 +5,17 @@ using System.Security.Permissions;
 using System.Threading.Tasks;
 using AutoMapper;
 using src.API.DTOs;
+using src.Application.Common;
 using src.Application.Models;
 using src.Application.UseCases.CheckZipCodeValidity.Interfaces;
 using src.Application.UseCases.ConsultCNPJ.Interfaces;
 using src.Application.UseCases.CreateTransporter.Interfaces;
-using src.Application.UseCases.CreateTransporter.MethodResponse;
 using src.Application.UseCases.GenerateVerificationCode.Interfaces;
 using src.Application.UseCases.SendVerificationCodeToEmail.Interfaces;
 using src.Domain.Entities;
 using src.Infrastructure.Repositories.Interfaces;
 using src.Infrastructure.Repositories.Interfaces.TemporaryData;
+using src.Infrastructure.Repositories.Interfaces.Utility;
 using src.Infrastructure.Repositories.Interfaces.VerificationCode;
 
 namespace src.Application.UseCases.CreateTransporter.Implementations
@@ -28,8 +29,9 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
         private readonly IZipCodeValidityCheckerService _zipCodeValidityCheckerService;
         private readonly IConsultCnpjService _consultCnpjService;
         private readonly ITransporterTemporaryDataRepository _transporterTemporaryDataRepository;
+        private readonly IUtilityRepository _utilityRepository;
 
-        public TransporterService(IMapper mapper, ITransporterRepository transporterRepository, IVerificationCodeHandler verificationCode, ISendVerificationCodeToEmailService sendVerificationCodeToEmailService, IZipCodeValidityCheckerService zipCodeValidityCheckerService, IConsultCnpjService consultCnpjService, ITransporterTemporaryDataRepository transporterTemporaryDataRepository)
+        public TransporterService(IMapper mapper, ITransporterRepository transporterRepository, IVerificationCodeHandler verificationCode, ISendVerificationCodeToEmailService sendVerificationCodeToEmailService, IZipCodeValidityCheckerService zipCodeValidityCheckerService, IConsultCnpjService consultCnpjService, ITransporterTemporaryDataRepository transporterTemporaryDataRepository, IUtilityRepository utilityRepository)
         {
             _mapper = mapper;
             _transporterRepository = transporterRepository;
@@ -38,10 +40,16 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
             _zipCodeValidityCheckerService = zipCodeValidityCheckerService;
             _consultCnpjService = consultCnpjService;
             _transporterTemporaryDataRepository = transporterTemporaryDataRepository;
+            _utilityRepository = utilityRepository;
         }
 
         public async Task<PendingRegistration> StartRegistrationAsync(PendingRegistration pendingRegistration)
         {
+            var isEmailRegistered = await _utilityRepository.IsEmailRegisteredAsync(pendingRegistration.Email);
+            if (!isEmailRegistered)
+            {
+                throw new InvalidOperationException("The provided email is already registered.");
+            }
 
             bool isValidCnpj = await _consultCnpjService.IsCnpjValidAsync(pendingRegistration.CNPJ);
             if (!isValidCnpj)
@@ -65,7 +73,7 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
             return temporaryData;
         }
 
-        public async Task<RegistrationResult> EndRegistrationAsync(string verificationCode)
+        public async Task<MethodResponse> EndRegistrationAsync(string verificationCode)
         {
             var code = await _verificationCode.GetVerificationCodeAsync(verificationCode);
             if (string.IsNullOrWhiteSpace(code.Code))
@@ -106,7 +114,7 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
             result.Location_ID = savedLocation.Location_ID;
             await _transporterRepository.UpdateAsync(result);
 
-            return new RegistrationResult
+            return new MethodResponse
             {
                 Success = true,
                 Message = "Registration completed successfully.",

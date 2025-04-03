@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using src.API.DTOs;
-using src.Application.UseCases.CreateTransporter.MethodResponse;
+using src.Application.Common;
 using src.Domain.Entities;
 
 namespace src.Application.UseCases.CreateTransporter.Interfaces
@@ -11,6 +11,6 @@ namespace src.Application.UseCases.CreateTransporter.Interfaces
     public interface ITransporterService
     {
         Task<PendingRegistration> StartRegistrationAsync(PendingRegistration pendingRegistration);
-        Task<RegistrationResult> EndRegistrationAsync(string verificationCode);
+        Task<MethodResponse> EndRegistrationAsync(string verificationCode);
     }
 }

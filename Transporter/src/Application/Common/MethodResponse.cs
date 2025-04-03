@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace src.Application.UseCases.CreateTransporter.MethodResponse
+namespace src.Application.Common
 {
-    public class RegistrationResult
+    public class MethodResponse
     {
         public bool Success { get; set; }
         public string Message { get; set; }

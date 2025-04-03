@@ -18,6 +18,10 @@ using src.Application.UseCases.ConsultCNPJ.Interfaces;
 using src.Application.UseCases.ConsultCNPJ.Imlementations;
 using src.Infrastructure.Repositories.Interfaces.TemporaryData;
 using src.Infrastructure.Repositories.Implementations.TemporaryData;
+using src.Application.UseCases.AuthenticateTransporter.Interfaces;
+using src.Application.UseCases.AuthenticateTransporter.Implementations;
+using src.Infrastructure.Repositories.Interfaces.Utility;
+using src.Infrastructure.Repositories.Implementations.Utility;
 
 DotNetEnv.Env.Load();
 
@@ -46,6 +50,9 @@ builder.Services.AddScoped<MimeKit.MimeMessage>();
 builder.Services.AddScoped<IZipCodeValidityCheckerService, ZipCodeValidityCheckerService>();
 builder.Services.AddScoped<IConsultCnpjService, ConsultCnpjService>();
 builder.Services.AddScoped<ITransporterTemporaryDataRepository, TransporterTemporaryDataRepository>();
+builder.Services.AddScoped<IAuthenticateTransporterService, AuthenticateTransporterService>();
+builder.Services.AddScoped<IUtilityRepository, UtilityRepository>();
+
 
 builder.Services.AddSingleton<HttpClient>();
 
