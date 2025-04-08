@@ -11,11 +11,11 @@ namespace src.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TransporterController : ControllerBase
+    public class RegistrationController : ControllerBase
     {
         private readonly ITransporterService _transporterService;
 
-        public TransporterController(ITransporterService transporterService)
+        public RegistrationController(ITransporterService transporterService)
         {
             _transporterService = transporterService;
         }
