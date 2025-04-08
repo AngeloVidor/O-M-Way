@@ -36,7 +36,7 @@ namespace src.API.Middlewares
                 return;
             }
 
-            var tokenAccess = context.Request.Headers["Authorization"].FirstOrDefault().Split("")[1];
+            var tokenAccess = context.Request.Headers["Authorization"].FirstOrDefault().Split(" ")[1];
             if (string.IsNullOrEmpty(tokenAccess)) throw new Exception("Token not provided");
 
 

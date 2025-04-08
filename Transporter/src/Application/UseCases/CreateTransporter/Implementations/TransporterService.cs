@@ -46,22 +46,13 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
         public async Task<PendingRegistration> StartRegistrationAsync(PendingRegistration pendingRegistration)
         {
             var isEmailRegistered = await _utilityRepository.IsEmailRegisteredAsync(pendingRegistration.Email);
-            if (!isEmailRegistered)
-            {
-                throw new InvalidOperationException("The provided email is already registered.");
-            }
+            if (!isEmailRegistered) throw new InvalidOperationException("The provided email is already registered.");
 
             bool isValidCnpj = await _consultCnpjService.IsCnpjValidAsync(pendingRegistration.CNPJ);
-            if (!isValidCnpj)
-            {
-                throw new ArgumentException("Invalid or inactive CNPJ. It must contain exactly 14 digits.");
-            }
+            if (!isValidCnpj) throw new ArgumentException("Invalid or inactive CNPJ. It must contain exactly 14 digits.");
 
             bool isValidZipCode = await _zipCodeValidityCheckerService.IsValidZipCodeAsync(pendingRegistration.Location.CEP);
-            if (!isValidZipCode)
-            {
-                throw new ArgumentException("Invalid zip code. It must contain exactly 8 digits without the hyphen.");
-            }
+            if (!isValidZipCode) throw new ArgumentException("Invalid zip code. It must contain exactly 8 digits without the hyphen.");
 
             var response = await _verificationCode.GenerateCodeAsync(pendingRegistration.Email);
             pendingRegistration.VerificationCode = response.Code;
@@ -76,18 +67,13 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
         public async Task<MethodResponse> EndRegistrationAsync(string verificationCode)
         {
             var code = await _verificationCode.GetVerificationCodeAsync(verificationCode);
-            if (string.IsNullOrWhiteSpace(code.Code))
-            {
-                throw new ArgumentException("Invalid Verification Code");
-            }
+            if (string.IsNullOrWhiteSpace(code.Code)) throw new ArgumentException("Invalid Verification Code");
+
+
             DateTime currentTime = DateTime.Now;
-            if (code.ExpirationDate <= currentTime)
-            {
-                throw new UnauthorizedAccessException("The code has expired and cannot be used.");
-            }
+            if (code.ExpirationDate <= currentTime) throw new UnauthorizedAccessException("The code has expired and cannot be used.");
 
             var temporaryData = await _transporterTemporaryDataRepository.GetTemporaryDataAsync(code.Code);
-
 
             var transporterCompany = new TransporterCompany
             {

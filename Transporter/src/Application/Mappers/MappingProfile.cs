@@ -13,6 +13,8 @@ namespace src.Application.Mappers
         public MappingProfile()
         {
             CreateMap<TransporterCompany, TransporterCompanyDTO>().ReverseMap();
+            CreateMap<Employee, EmployeeDTO>().ReverseMap();
+
         }
     }
 }

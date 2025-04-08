@@ -28,6 +28,15 @@ using src.Application.Security.Model;
 using Microsoft.OpenApi.Models;
 using src.Application.UseCases.Utility.Interfaces;
 using src.Application.UseCases.Utility.Implementations;
+using src.Infrastructure.Repositories.Interfaces.Employees;
+using src.Infrastructure.Repositories.Implementations.Employees;
+using src.Application.UseCases.Employees.Interfaces;
+using src.Application.UseCases.Employees.Implementations;
+using src.API.Middlewares;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+
 
 DotNetEnv.Env.Load();
 
@@ -90,6 +99,10 @@ builder.Services.AddScoped<IAuthenticateTransporterService, AuthenticateTranspor
 builder.Services.AddScoped<IUtilityRepository, UtilityRepository>();
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IEmployeerManagerRepository, EmployeerManagerRepository>();
+
 
 var jwtDurationStr = Environment.GetEnvironmentVariable("JWT_DURATION");
 var jwtDuration = string.IsNullOrEmpty(jwtDurationStr) ? 30 : int.Parse(jwtDurationStr);
@@ -105,6 +118,23 @@ builder.Services.AddSingleton(jwtConfig);
 builder.Services.AddSingleton<HttpClient>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtConfig.JWT_ISSUER,
+            ValidAudience = jwtConfig.JWT_AUDIENCE,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.JWT_KEY))
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 
 var app = builder.Build();
@@ -115,6 +145,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseMiddleware<JwtAuthorizationMiddleware>();
+
 
 app.UseHttpsRedirection();
 

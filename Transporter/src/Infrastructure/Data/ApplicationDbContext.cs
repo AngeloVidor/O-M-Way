@@ -20,6 +20,7 @@ namespace src.Infrastructure.Data
         public DbSet<Location> Locations { get; set; }
         public DbSet<PendingRegistration> TransporterPreRegistrations { get; set; }
         public DbSet<PendingLocation> PendingLocations { get; set; }
+        public DbSet<Employee> Employees { get; set; }
 
 
 

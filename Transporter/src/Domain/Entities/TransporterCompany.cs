@@ -22,5 +22,6 @@ namespace src.Domain.Entities
         [ForeignKey("Location_ID")]
         public Location Location { get; set; }
         public DateTime CreatedAt { get; set; }
+        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
     }
 }
