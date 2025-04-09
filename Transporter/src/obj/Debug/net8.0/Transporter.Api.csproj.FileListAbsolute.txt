@@ -313,3 +313,5 @@ C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\Transporter.Ap
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\Transporter.Api.genruntimeconfig.cache
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\ref\Transporter.Api.dll
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\angel\Desktop\On-My-Way\Transporter\src\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\angel\Desktop\On-My-Way\Transporter\src\bin\Debug\net8.0\RabbitMQ.Client.dll
