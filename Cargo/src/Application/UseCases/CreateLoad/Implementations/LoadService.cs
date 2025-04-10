@@ -6,6 +6,7 @@ using AutoMapper;
 using src.API.DTOs;
 using src.Application.Common;
 using src.Application.UseCases.CreateLoad.Interfaces;
+using src.Application.UseCases.ValidateCPF.Interface;
 using src.Domain.Entities;
 using src.Infrastructure.Broker.Driver.Interface;
 using src.Infrastructure.Repositories.Interfaces.Loading;
@@ -29,8 +30,8 @@ namespace src.Application.UseCases.CreateLoad.Implementations
         {
             var loadEntity = _mapper.Map<Load>(load);
 
+
             var driverData = await _publisher.PublishAsync(loadEntity.Transporter_ID, loadEntity.Driver_ID);
-            Console.WriteLine($"ErrorMessage: {driverData.ErrorMessage}");
             if (!string.IsNullOrEmpty(driverData.ErrorMessage))
             {
                 return new MethodResponse
@@ -63,7 +64,7 @@ namespace src.Application.UseCases.CreateLoad.Implementations
                 return new MethodResponse
                 {
                     Success = false,
-                    Message = "Failed to create load."
+                    Message = ex.Message
                 };
             }
 

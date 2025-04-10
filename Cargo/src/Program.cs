@@ -8,6 +8,8 @@ using src.Application.Mappers;
 using src.Application.Security;
 using src.Application.UseCases.CreateLoad.Implementations;
 using src.Application.UseCases.CreateLoad.Interfaces;
+using src.Application.UseCases.ValidateCPF.Implementation;
+using src.Application.UseCases.ValidateCPF.Interface;
 using src.Infrastructure.Broker.Driver.Implementation;
 using src.Infrastructure.Broker.Driver.Interface;
 using src.Infrastructure.Data;
@@ -65,6 +67,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ILoadRepository, LoadRepository>();
 builder.Services.AddScoped<ILoadService, LoadService>();
 builder.Services.AddSingleton<IDriverIdentificationPublisher, DriverIdentificationPublisher>();
+builder.Services.AddSingleton<IValidateCpfService, ValidateCpfService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
