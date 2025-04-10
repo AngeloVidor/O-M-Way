@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace src.Infrastructure.Broker.Subscribers.Driver.Messages
+namespace src.Infrastructure.Broker.Driver.Messages
 {
     public class DriverResponse
     {

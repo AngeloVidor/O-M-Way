@@ -28,11 +28,19 @@ namespace src.Application.UseCases.CreateLoad.Implementations
         public async Task<MethodResponse> CreateLoadAsync(LoadDTO load)
         {
             var loadEntity = _mapper.Map<Load>(load);
-            
-            await _publisher.PublishAsync(loadEntity.Transporter_ID, loadEntity.Driver_ID);
+
+            var driverData = await _publisher.PublishAsync(loadEntity.Transporter_ID, loadEntity.Driver_ID);
+            Console.WriteLine($"ErrorMessage: {driverData.ErrorMessage}");
+            if (!string.IsNullOrEmpty(driverData.ErrorMessage))
+            {
+                return new MethodResponse
+                {
+                    Success = false,
+                    Message = driverData.ErrorMessage
+                };
+            }
             try
             {
-
                 var result = await _loadRepository.CreateLoadAsync(loadEntity);
                 if (result)
                 {

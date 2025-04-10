@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Azure;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -37,6 +38,8 @@ namespace src.Infrastructure.Broker.Subscribers.Driver.Implementations
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += async (model, ea) =>
             {
+                string correlationId = ea.BasicProperties.CorrelationId;
+
                 try
                 {
                     var body = ea.Body.ToArray();
@@ -44,30 +47,42 @@ namespace src.Infrastructure.Broker.Subscribers.Driver.Implementations
                     var response = JsonConvert.DeserializeObject<DriverRequest>(message);
 
                     var validateResponse = await ValidateDriverIdentification(response.Transporter_ID, response.Driver_ID);
-                    var messageResponse = new DriverResponse
+                    if (validateResponse != null)
                     {
-                        Driver_ID = validateResponse?.Employee_ID ?? 0,
-                        Transporter_ID = validateResponse?.Transporter_ID ?? 0,
-                        CorrelationId = response.CorrelationId,
-                        Success = validateResponse != null
-                    };
-                    var replyTo = ea.BasicProperties.ReplyTo;
-                    await Publish(messageResponse, replyTo);
-                    _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                        var messageResponse = new DriverResponse
+                        {
+                            Driver_ID = validateResponse.Employee_ID,
+                            Transporter_ID = validateResponse.Transporter_ID,
+                            CorrelationId = response.CorrelationId,
+                            Username = validateResponse.Username,
+                        };
+                        var replyTo = ea.BasicProperties.ReplyTo;
+                        await Publish(messageResponse, replyTo);
+                        _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                    }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"[Error] Failed to process message: {ex.Message}");
+                    var errorResponse = new DriverResponse
+                    {
+                        CorrelationId = correlationId,
+                        ErrorMessage = ex.Message
+                    };
+                    var replyTo = ea.BasicProperties.ReplyTo;
+                    await Publish(errorResponse, replyTo);
+
                     _channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: false);
                 }
-
             };
             _channel.BasicConsume(queue: "driver-identification-request", autoAck: false, consumer: consumer);
         }
 
         public async Task<EmployeeDTO> ValidateDriverIdentification(long transporterId, long driverId)
         {
-            return await _employeerManagerService.FindDriverInTransporterAsync(transporterId, driverId);
+            var result = await _employeerManagerService.FindDriverInTransporterAsync(transporterId, driverId);
+            if (result == null) throw new Exception("Driver not found in transporter");
+            return result;
         }
 
         public Task Publish(DriverResponse driverResponse, string replyTo)

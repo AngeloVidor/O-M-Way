@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using src.API.DTOs;
 using src.Application.UseCases.CreateLoad.Interfaces;
@@ -21,10 +22,14 @@ namespace src.API.Controllers
             _loadService = loadService;
         }
 
-        [HttpPost("create")]
+        [HttpPost("driver/{driverId}/deadline/{deliveryDeadline}")]
         [Authorize(Roles = "transporter")]
-        public async Task<IActionResult> CreateLoad(long driverId)
+        public async Task<IActionResult> CreateLoad(long driverId, DateTime deliveryDeadline)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             long transporterId = long.Parse(HttpContext.Items["transporterId"].ToString());
             var load = new LoadDTO
@@ -32,19 +37,19 @@ namespace src.API.Controllers
                 Transporter_ID = transporterId,
                 Driver_ID = driverId,
                 LoadingStartedAt = DateTime.Now,
-                DeliveryDeadline = DateTime.Now.AddDays(7),
+                DeliveryDeadline = deliveryDeadline,
                 IsDelivered = false,
                 Status = LoadStatus.Created
             };
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
             try
             {
                 var response = await _loadService.CreateLoadAsync(load);
-                return Ok(load);
+                if (!response.Success)
+                {
+                    return BadRequest(response.Message);
+                }
+                return Ok(new { message = response.Message });
             }
             catch (Exception ex)
             {
@@ -53,3 +58,5 @@ namespace src.API.Controllers
         }
     }
 }
+
+
