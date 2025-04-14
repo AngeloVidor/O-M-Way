@@ -26,8 +26,8 @@ namespace src.API.Middlewares
             List<string> PublicRoutes = new List<string>
             {
                 "/api/Authenticate/login",
-                "/api/Transporter/StartRegistration",
-                "/api/Transporter/EndRegistration"
+                "/api/Registration/StartRegistration",
+                "/api/Registration/EndRegistration"
             };
 
             if (PublicRoutes.Contains(context.Request.Path.Value, StringComparer.OrdinalIgnoreCase))
