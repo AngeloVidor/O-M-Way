@@ -7,6 +7,7 @@ using src.API.DTOs;
 using src.Application.Common;
 using src.Application.UseCases.Employees.Interfaces;
 using src.Domain.Entities;
+using src.Infrastructure.Broker.Events.DriverCreated.Interfaces;
 using src.Infrastructure.Repositories.Interfaces.Employees;
 
 namespace src.Application.UseCases.Employees.Implementations
@@ -16,12 +17,14 @@ namespace src.Application.UseCases.Employees.Implementations
         private readonly IMapper _mapper;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IEmployeerManagerRepository _employeerManagerRepository;
+        private readonly IDriverEventPublisher _driverEventPublisher;
 
-        public EmployeeService(IMapper mapper, IEmployeeRepository employeeRepository, IEmployeerManagerRepository employeerManagerRepository)
+        public EmployeeService(IMapper mapper, IEmployeeRepository employeeRepository, IEmployeerManagerRepository employeerManagerRepository, IDriverEventPublisher driverEventPublisher)
         {
             _mapper = mapper;
             _employeeRepository = employeeRepository;
             _employeerManagerRepository = employeerManagerRepository;
+            _driverEventPublisher = driverEventPublisher;
         }
 
         public async Task<MethodResponse> AddEmployeeAsync(EmployeeDTO employee)
@@ -40,6 +43,8 @@ namespace src.Application.UseCases.Employees.Implementations
 
             employeeEntity.Password = BCrypt.Net.BCrypt.HashPassword(employee.Password);
             var addedEmployee = await _employeeRepository.AddEmployeeAsync(employeeEntity);
+            _driverEventPublisher.Publish(employee.Transporter_ID, employeeEntity.Employee_ID, employee.Username).Wait();
+
             return new MethodResponse
             {
                 Success = addedEmployee,

@@ -306,7 +306,6 @@ C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\staticwebasset
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.Transporter.Api.props
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.Transporter.Api.props
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\staticwebassets.pack.json
-C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\Transpor.31CA7A3B.Up2Date
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\Transporter.Api.dll
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\refint\Transporter.Api.dll
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\Transporter.Api.pdb
@@ -315,3 +314,4 @@ C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\ref\Transporte
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\bin\Debug\net8.0\Newtonsoft.Json.dll
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\bin\Debug\net8.0\RabbitMQ.Client.dll
+C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\Transpor.31CA7A3B.Up2Date

@@ -13,6 +13,7 @@ namespace src.Application.Mappers
         public MappingProfile()
         {
             CreateMap<Load, LoadDTO>().ReverseMap();
+            CreateMap<Product, ProductDTO>().ReverseMap();
         }
     }
 }

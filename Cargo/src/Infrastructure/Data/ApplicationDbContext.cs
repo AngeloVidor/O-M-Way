@@ -13,8 +13,9 @@ namespace src.Infrastructure.Data
         {
         }
         public DbSet<Load> Loads { get; set; }
-        public DbSet<LoadItem> LoadItems { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<DriverSnapshot> DriverSnapshots { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

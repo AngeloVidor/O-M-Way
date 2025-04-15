@@ -8,12 +8,17 @@ using src.Application.Mappers;
 using src.Application.Security;
 using src.Application.UseCases.CreateLoad.Implementations;
 using src.Application.UseCases.CreateLoad.Interfaces;
+using src.Application.UseCases.DriverSnapshots.Implementations;
+using src.Application.UseCases.DriverSnapshots.Interfaces;
 using src.Application.UseCases.ValidateCPF.Implementation;
 using src.Application.UseCases.ValidateCPF.Interface;
-using src.Infrastructure.Broker.Driver.Implementation;
-using src.Infrastructure.Broker.Driver.Interface;
+using src.Infrastructure.Broker.Background;
+using src.Infrastructure.Broker.Events.Subscriber.DriverCreated.Implementations;
+using src.Infrastructure.Broker.Events.Subscriber.DriverCreated.Interfaces;
 using src.Infrastructure.Data;
+using src.Infrastructure.Repositories.Implementations.DriverSnapshots;
 using src.Infrastructure.Repositories.Implementations.Loading;
+using src.Infrastructure.Repositories.Interfaces.DriverSnapshots;
 using src.Infrastructure.Repositories.Interfaces.Loading;
 
 
@@ -66,8 +71,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 builder.Services.AddScoped<ILoadRepository, LoadRepository>();
 builder.Services.AddScoped<ILoadService, LoadService>();
-builder.Services.AddSingleton<IDriverIdentificationPublisher, DriverIdentificationPublisher>();
 builder.Services.AddSingleton<IValidateCpfService, ValidateCpfService>();
+
+builder.Services.AddSingleton<IHostedService, ServiceBackground>();
+builder.Services.AddScoped<IDriverEventConsumer, DriverEventConsumer>();
+builder.Services.AddScoped<IDriverSnapshotRepository, DriverSnapshotRepository>();
+builder.Services.AddScoped<IDriverSnapshotService, DriverSnapshotService>();
+
+
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

@@ -36,9 +36,8 @@ using src.API.Middlewares;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
-using src.Infrastructure.Broker.Background;
-using src.Infrastructure.Broker.Subscribers.Driver.Interfaces;
-using src.Infrastructure.Broker.Subscribers.Driver.Implementations;
+using src.Infrastructure.Broker.Events.DriverCreated.Interfaces;
+using src.Infrastructure.Broker.Events.DriverCreated.Implementations;
 
 
 DotNetEnv.Env.Load();
@@ -105,9 +104,8 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IEmployeerManagerRepository, EmployeerManagerRepository>();
-builder.Services.AddSingleton<IHostedService, ServiceBackground>();
-builder.Services.AddScoped<IDriverIdentificationSubscriber, DriverIdentificationSubscriber>();
 builder.Services.AddScoped<IEmployeerManagerService, EmployeerManagerService>();
+builder.Services.AddSingleton<IDriverEventPublisher, DriverEventPublisher>();
 
 var jwtDurationStr = Environment.GetEnvironmentVariable("JWT_DURATION");
 var jwtDuration = string.IsNullOrEmpty(jwtDurationStr) ? 30 : int.Parse(jwtDurationStr);

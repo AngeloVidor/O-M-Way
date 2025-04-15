@@ -12,7 +12,7 @@ namespace src.Application.UseCases.ValidateCPF.Implementation
         {
             if (string.IsNullOrEmpty(cpf)) return false;
 
-            var formattedCpf = new string(cpf.Where(char.IsDigit).ToArray());
+            string formattedCpf = new string(cpf.Where(char.IsDigit).ToArray());
 
             if (formattedCpf.Length != 11) return false;
             if (formattedCpf.Distinct().Count() == 1) return false;

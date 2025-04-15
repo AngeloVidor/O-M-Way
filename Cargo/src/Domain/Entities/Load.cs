@@ -18,7 +18,7 @@ namespace src.Domain.Entities
         public DateTime DeliveredAt { get; set; }
         public bool IsDelivered { get; set; }
         public LoadStatus Status { get; set; }
-
+        public List<Product> Products { get; set; } = new List<Product>();
         public enum LoadStatus
         {
             Created,

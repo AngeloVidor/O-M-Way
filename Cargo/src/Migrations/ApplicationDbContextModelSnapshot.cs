@@ -58,6 +58,29 @@ namespace src.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("src.Domain.Entities.DriverSnapshot", b =>
+                {
+                    b.Property<long>("Snapshot_ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Snapshot_ID"));
+
+                    b.Property<long>("Employee_ID")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Transporter_ID")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Snapshot_ID");
+
+                    b.ToTable("DriverSnapshots");
+                });
+
             modelBuilder.Entity("src.Domain.Entities.Load", b =>
                 {
                     b.Property<long>("Load_ID")
@@ -96,7 +119,7 @@ namespace src.Migrations
                     b.ToTable("Loads");
                 });
 
-            modelBuilder.Entity("src.Domain.Entities.LoadItem", b =>
+            modelBuilder.Entity("src.Domain.Entities.Product", b =>
                 {
                     b.Property<long>("Product_ID")
                         .ValueGeneratedOnAdd()
@@ -122,10 +145,12 @@ namespace src.Migrations
 
                     b.HasIndex("Address_ID");
 
-                    b.ToTable("LoadItems");
+                    b.HasIndex("Load_ID");
+
+                    b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("src.Domain.Entities.LoadItem", b =>
+            modelBuilder.Entity("src.Domain.Entities.Product", b =>
                 {
                     b.HasOne("src.Domain.Entities.Address", "Address")
                         .WithMany()
@@ -133,7 +158,20 @@ namespace src.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("src.Domain.Entities.Load", "Load")
+                        .WithMany("Products")
+                        .HasForeignKey("Load_ID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Address");
+
+                    b.Navigation("Load");
+                });
+
+            modelBuilder.Entity("src.Domain.Entities.Load", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

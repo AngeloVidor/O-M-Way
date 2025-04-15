@@ -8,7 +8,7 @@ using src.Application.Common;
 using src.Application.UseCases.CreateLoad.Interfaces;
 using src.Application.UseCases.ValidateCPF.Interface;
 using src.Domain.Entities;
-using src.Infrastructure.Broker.Driver.Interface;
+using src.Infrastructure.Repositories.Interfaces.DriverSnapshots;
 using src.Infrastructure.Repositories.Interfaces.Loading;
 
 namespace src.Application.UseCases.CreateLoad.Implementations
@@ -17,27 +17,26 @@ namespace src.Application.UseCases.CreateLoad.Implementations
     {
         private readonly ILoadRepository _loadRepository;
         private readonly IMapper _mapper;
-        private readonly IDriverIdentificationPublisher _publisher;
+        private readonly IDriverSnapshotRepository _driverSnapshotRepository;
 
-        public LoadService(ILoadRepository loadRepository, IMapper mapper, IDriverIdentificationPublisher publisher)
+        public LoadService(ILoadRepository loadRepository, IMapper mapper, IDriverSnapshotRepository driverSnapshotRepository)
         {
             _loadRepository = loadRepository;
             _mapper = mapper;
-            _publisher = publisher;
+            _driverSnapshotRepository = driverSnapshotRepository;
         }
 
         public async Task<MethodResponse> CreateLoadAsync(LoadDTO load)
         {
             var loadEntity = _mapper.Map<Load>(load);
 
-
-            var driverData = await _publisher.PublishAsync(loadEntity.Transporter_ID, loadEntity.Driver_ID);
-            if (!string.IsNullOrEmpty(driverData.ErrorMessage))
+            var driver = await _driverSnapshotRepository.GetTransporterDriverAsync(loadEntity.Transporter_ID, loadEntity.Driver_ID);
+            if (driver == null)
             {
                 return new MethodResponse
                 {
                     Success = false,
-                    Message = driverData.ErrorMessage
+                    Message = "Driver not found for the transporter."
                 };
             }
             try
