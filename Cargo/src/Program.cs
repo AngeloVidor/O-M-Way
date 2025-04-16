@@ -8,6 +8,8 @@ using src.Application.Mappers;
 using src.Application.Security;
 using src.Application.UseCases.AddProduct.Implementations;
 using src.Application.UseCases.AddProduct.Interfaces;
+using src.Application.UseCases.CheckZipCodeValidity.Implementations;
+using src.Application.UseCases.CheckZipCodeValidity.Interfaces;
 using src.Application.UseCases.CreateLoad.Implementations;
 using src.Application.UseCases.CreateLoad.Interfaces;
 using src.Application.UseCases.DriverSnapshots.Implementations;
@@ -85,8 +87,10 @@ builder.Services.AddScoped<IDriverSnapshotService, DriverSnapshotService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ILoadManagementRepository, LoadManagementRepository>();
+builder.Services.AddSingleton<IZipCodeValidityCheckerService, ZipCodeValidityCheckerService>();
 
 
+builder.Services.AddSingleton<HttpClient>();
 
 
 

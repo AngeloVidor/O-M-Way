@@ -27,10 +27,10 @@ namespace src.API.Controllers
                 return BadRequest("Product cannot be null");
             }
 
-            var response = await _productService.AddLoadItemAsync(product);
+            var response = await _productService.AddProductToLoadAsync(product);
             if (!response.Success)
             {
-                return BadRequest(response.Message);
+                return BadRequest(response);
             }
 
             return Ok(response);

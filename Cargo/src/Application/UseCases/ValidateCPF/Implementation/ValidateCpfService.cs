@@ -10,14 +10,14 @@ namespace src.Application.UseCases.ValidateCPF.Implementation
     {
         public bool IsValid(string cpf)
         {
-            if (string.IsNullOrEmpty(cpf)) return false;
+            if (string.IsNullOrEmpty(cpf)) throw new ArgumentNullException(nameof(cpf), "CPF cannot be null or empty.");
+            var isValidFormat = IsValidFormat(cpf);
+            if (!isValidFormat) throw new ArgumentException("Invalid CPF format.");
 
-            string formattedCpf = new string(cpf.Where(char.IsDigit).ToArray());
+            if (cpf.Length != 11) return false;
+            if (cpf.Distinct().Count() == 1) return false;
 
-            if (formattedCpf.Length != 11) return false;
-            if (formattedCpf.Distinct().Count() == 1) return false;
-
-            var baseNumber = formattedCpf.Substring(0, 9).Select(c => int.Parse(c.ToString())).ToArray();
+            var baseNumber = cpf.Substring(0, 9).Select(c => int.Parse(c.ToString())).ToArray();
 
             int sum = 0;
             for (int i = 0; i < 9; i++)
@@ -38,9 +38,21 @@ namespace src.Application.UseCases.ValidateCPF.Implementation
             int secondDigit = sum % 11;
             secondDigit = secondDigit < 2 ? 0 : 11 - secondDigit;
 
-            int originalFirst = int.Parse(formattedCpf[9].ToString());
-            int originalSecond = int.Parse(formattedCpf[10].ToString());
+            int originalFirst = int.Parse(cpf[9].ToString());
+            int originalSecond = int.Parse(cpf[10].ToString());
             return firstDigit == originalFirst && secondDigit == originalSecond;
+        }
+
+        public bool IsValidFormat(string cpf)
+        {
+            for (int i = 0; i < cpf.Length; i++)
+            {
+                if (!char.IsDigit(cpf[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

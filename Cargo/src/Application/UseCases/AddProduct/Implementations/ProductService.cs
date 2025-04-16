@@ -6,6 +6,7 @@ using AutoMapper;
 using src.API.DTOs;
 using src.Application.Common;
 using src.Application.UseCases.AddProduct.Interfaces;
+using src.Application.UseCases.CheckZipCodeValidity.Interfaces;
 using src.Application.UseCases.ValidateCPF.Interface;
 using src.Domain.Entities;
 using src.Infrastructure.Repositories.Interfaces.Loading;
@@ -20,16 +21,18 @@ namespace src.Application.UseCases.AddProduct.Implementations
         private readonly IMapper _mapper;
         private readonly IValidateCpfService _validateCpfService;
         private readonly ILoadManagementRepository _loadManagementRepository;
+        private readonly IZipCodeValidityCheckerService _zipCodeValidityCheckerService;
 
-        public ProductService(IProductRepository productRepository, IMapper mapper, IValidateCpfService validateCpfService, ILoadManagementRepository loadManagementRepository)
+        public ProductService(IProductRepository productRepository, IMapper mapper, IValidateCpfService validateCpfService, ILoadManagementRepository loadManagementRepository, IZipCodeValidityCheckerService zipCodeValidityCheckerService)
         {
             _productRepository = productRepository;
             _mapper = mapper;
             _validateCpfService = validateCpfService;
             _loadManagementRepository = loadManagementRepository;
+            _zipCodeValidityCheckerService = zipCodeValidityCheckerService;
         }
 
-        public async Task<MethodResponse> AddLoadItemAsync(ProductDTO product)
+        public async Task<MethodResponse> AddProductToLoadAsync(ProductDTO product)
         {
             try
             {
@@ -43,6 +46,17 @@ namespace src.Application.UseCases.AddProduct.Implementations
                         Message = "Invalid CPF"
                     };
                 }
+                Console.WriteLine($"ZipCode: {productEntity.Address.ZipCode}");
+                bool isZipCodeValid = await _zipCodeValidityCheckerService.IsValidZipCodeAsync(productEntity.Address.ZipCode);
+                if (!isZipCodeValid)
+                {
+                    return new MethodResponse
+                    {
+                        Success = false,
+                        Message = "Invalid ZipCode"
+                    };
+                }
+
                 var load = await _loadManagementRepository.GetLoadByIdAsync(productEntity.Load_ID);
                 if (load == null)
                 {

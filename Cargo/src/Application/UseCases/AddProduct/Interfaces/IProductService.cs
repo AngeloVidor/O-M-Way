@@ -9,7 +9,7 @@ namespace src.Application.UseCases.AddProduct.Interfaces
 {
     public interface IProductService
     {
-        Task<MethodResponse> AddLoadItemAsync(ProductDTO product);
+        Task<MethodResponse> AddProductToLoadAsync(ProductDTO product);
 
     }
 }
