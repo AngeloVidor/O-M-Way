@@ -11,13 +11,16 @@ namespace src.API.DTOs
     {
         [Key]
         public long Load_ID { get; set; }
+
+        [Required]
         public long Transporter_ID { get; set; } //fk
+
+        [Required]
         public long Driver_ID { get; set; } //fk
         public DateTime LoadingStartedAt { get; set; } = DateTime.Now;
-        //public DateTime LoadingFinishedAt { get; set; }
+        [Required]
         public DateTime DeliveryDeadline { get; set; }
-        //public DateTime DeliveredAt { get; set; }
         public bool IsDelivered { get; set; } = false;
-        public LoadStatus Status { get; set; }    
+        public LoadStatus Status { get; set; }
     }
 }

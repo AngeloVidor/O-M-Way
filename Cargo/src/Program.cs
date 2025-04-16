@@ -6,6 +6,8 @@ using Microsoft.OpenApi.Models;
 using src.API.Middlewares;
 using src.Application.Mappers;
 using src.Application.Security;
+using src.Application.UseCases.AddProduct.Implementations;
+using src.Application.UseCases.AddProduct.Interfaces;
 using src.Application.UseCases.CreateLoad.Implementations;
 using src.Application.UseCases.CreateLoad.Interfaces;
 using src.Application.UseCases.DriverSnapshots.Implementations;
@@ -17,9 +19,12 @@ using src.Infrastructure.Broker.Events.Subscriber.DriverCreated.Implementations;
 using src.Infrastructure.Broker.Events.Subscriber.DriverCreated.Interfaces;
 using src.Infrastructure.Data;
 using src.Infrastructure.Repositories.Implementations.DriverSnapshots;
+using src.Infrastructure.Repositories.Implementations.Items;
 using src.Infrastructure.Repositories.Implementations.Loading;
+using src.Infrastructure.Repositories.Implementations.Loading.Management;
 using src.Infrastructure.Repositories.Interfaces.DriverSnapshots;
 using src.Infrastructure.Repositories.Interfaces.Loading;
+using src.Infrastructure.Repositories.Interfaces.Loading.Management;
 
 
 DotNetEnv.Env.Load();
@@ -77,6 +82,11 @@ builder.Services.AddSingleton<IHostedService, ServiceBackground>();
 builder.Services.AddScoped<IDriverEventConsumer, DriverEventConsumer>();
 builder.Services.AddScoped<IDriverSnapshotRepository, DriverSnapshotRepository>();
 builder.Services.AddScoped<IDriverSnapshotService, DriverSnapshotService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ILoadManagementRepository, LoadManagementRepository>();
+
+
 
 
 

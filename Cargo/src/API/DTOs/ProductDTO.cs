@@ -14,10 +14,6 @@ namespace src.API.DTOs
         [Key]
         public long Product_ID { get; set; }
         public long Load_ID { get; set; }
-        [ForeignKey("Load_ID")]
-        public Load Load { get; set; }
-        public long Address_ID { get; set; }
-        [ForeignKey("Address_ID")]
         public Address Address { get; set; }
         public string Name { get; set; }
         public string RecipientCPF { get; set; }

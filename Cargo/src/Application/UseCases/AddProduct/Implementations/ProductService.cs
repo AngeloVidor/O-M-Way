@@ -37,7 +37,7 @@ namespace src.Application.UseCases.AddProduct.Implementations
                 var isValid = _validateCpfService.IsValid(productEntity.RecipientCPF);
                 if (!isValid)
                 {
-                    var response = new MethodResponse
+                    return new MethodResponse
                     {
                         Success = false,
                         Message = "Invalid CPF"
@@ -46,14 +46,29 @@ namespace src.Application.UseCases.AddProduct.Implementations
                 var load = await _loadManagementRepository.GetLoadByIdAsync(productEntity.Load_ID);
                 if (load == null)
                 {
-
+                    return new MethodResponse
+                    {
+                        Success = false,
+                        Message = "Load not found"
+                    };
                 }
+                await _productRepository.AddLoadItemAsync(productEntity);
+                return new MethodResponse
+                {
+                    Success = true,
+                    Message = "Product added to load successfully"
+                };
             }
             catch (Exception ex)
             {
-
+                return new MethodResponse
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
             }
-            throw new NotImplementedException();
+
+
         }
     }
 }
