@@ -12,11 +12,13 @@ namespace src.Application.UseCases.SendVerificationCodeToEmail.Implementations
     {
         private readonly MimeMessage _message;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<SendVerificationCodeToEmailService> _logger;
 
-        public SendVerificationCodeToEmailService(MimeMessage message, IConfiguration configuration)
+        public SendVerificationCodeToEmailService(MimeMessage message, IConfiguration configuration, ILogger<SendVerificationCodeToEmailService> logger)
         {
             _message = message;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task SentAsync(string email, string code, DateTime CreatedAt, DateTime ExpirationDate)
@@ -33,6 +35,8 @@ namespace src.Application.UseCases.SendVerificationCodeToEmail.Implementations
                 throw new InvalidOperationException("The recipient's email cannot be null or empty.");
             }
 
+            _logger.LogInformation("I'm here...1........");
+
             _message.From.Add(new MailboxAddress("OmWay", fromEmail));
             _message.To.Add(new MailboxAddress("Cliente", email));
             _message.Subject = "Verification Code";
@@ -44,9 +48,12 @@ namespace src.Application.UseCases.SendVerificationCodeToEmail.Implementations
 
             using (var client = new SmtpClient())
             {
+
                 await client.ConnectAsync("smtp.gmail.com", 587, false);
                 await client.AuthenticateAsync(fromEmail, appPassword);
+                _logger.LogInformation("I'm here...4........");
                 await client.SendAsync(_message);
+                _logger.LogInformation("Verification code sent to email: {Email}", email);
                 await client.DisconnectAsync(true);
             }
         }

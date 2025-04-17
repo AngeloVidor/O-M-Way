@@ -12,10 +12,12 @@ namespace src.Application.UseCases.CheckZipCodeValidity.Implementations
     public class ZipCodeValidityCheckerService : IZipCodeValidityCheckerService
     {
         private readonly HttpClient _httpClient;
+        private readonly ILogger<ZipCodeValidityCheckerService> _logger;
 
-        public ZipCodeValidityCheckerService(HttpClient httpClient)
+        public ZipCodeValidityCheckerService(HttpClient httpClient, ILogger<ZipCodeValidityCheckerService> logger)
         {
             _httpClient = httpClient;
+            _logger = logger;
         }
 
         public async Task<bool> IsValidZipCodeAsync(string zipCode)
@@ -25,7 +27,7 @@ namespace src.Application.UseCases.CheckZipCodeValidity.Implementations
                 return false;
 
             string requestUrl = $"https://viacep.com.br/ws/{zipCode}/json/";
-            
+
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync(requestUrl);
@@ -39,6 +41,7 @@ namespace src.Application.UseCases.CheckZipCodeValidity.Implementations
             }
             catch (HttpRequestException)
             {
+                _logger.LogError("Error while making request to ViaCEP API for zip code: {ZipCode}", zipCode);
                 return false;
             }
         }

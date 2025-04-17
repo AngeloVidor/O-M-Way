@@ -38,6 +38,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using src.Infrastructure.Broker.Events.DriverCreated.Interfaces;
 using src.Infrastructure.Broker.Events.DriverCreated.Implementations;
+using Serilog;
 
 
 DotNetEnv.Env.Load();
@@ -86,6 +87,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+
 
 
 builder.Services.AddScoped<ITransporterRepository, TransporterRepository>();

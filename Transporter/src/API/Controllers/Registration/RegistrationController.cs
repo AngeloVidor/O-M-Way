@@ -14,10 +14,12 @@ namespace src.API.Controllers
     public class RegistrationController : ControllerBase
     {
         private readonly ITransporterService _transporterService;
+        private readonly ILogger<RegistrationController> _logger;
 
-        public RegistrationController(ITransporterService transporterService)
+        public RegistrationController(ITransporterService transporterService, ILogger<RegistrationController> logger)
         {
             _transporterService = transporterService;
+            _logger = logger;
         }
 
         [HttpPost("StartRegistration")]
@@ -28,7 +30,8 @@ namespace src.API.Controllers
                 return BadRequest(ModelState);
             }
             try
-            {
+            {                
+                _logger.LogInformation("Starting registration process for email: {Email}", pendingRegistration.Email);
                 var result = await _transporterService.StartRegistrationAsync(pendingRegistration);
                 return Ok(result);
             }

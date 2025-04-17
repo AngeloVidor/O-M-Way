@@ -315,3 +315,5 @@ C:\Users\angel\Desktop\On-My-Way\Transporter\src\bin\Debug\net8.0\Microsoft.AspN
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\bin\Debug\net8.0\Newtonsoft.Json.dll
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\bin\Debug\net8.0\RabbitMQ.Client.dll
 C:\Users\angel\Desktop\On-My-Way\Transporter\src\obj\Debug\net8.0\Transpor.31CA7A3B.Up2Date
+C:\Users\angel\Desktop\On-My-Way\Transporter\src\bin\Debug\net8.0\Serilog.dll
+C:\Users\angel\Desktop\On-My-Way\Transporter\src\bin\Debug\net8.0\Serilog.Sinks.Console.dll
