@@ -4,12 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using src.Domain.Entities;
 
-namespace src.Infrastructure.Repositories.Interfaces.TemporaryData
+namespace src.Application.UseCases.TemporaryData.Interfaces
 {
-    public interface ITransporterTemporaryDataRepository
+    public interface ITransporterTemporaryDataService
     {
-        Task<PendingRegistration> AddTemporaryDataAsync(PendingRegistration pendingRegistration);
-        Task<PendingRegistration> GetTemporaryDataAsync(string verificationCode);
         Task<PendingRegistration> UpdateCnpjValuesAsync(long transporterId, bool isValid);
         Task<bool> UpdateVerificationCodeAsync(long transporterId, string verificationCode);
     }

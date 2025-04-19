@@ -18,5 +18,7 @@ namespace src.Domain.Entities
         public PendingLocation Location { get; set; }
         public string VerificationCode { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool IsCnpj_Valid { get; set; } = false;
+        public bool Cnpj_Validated { get; set; }
     }
 }

@@ -39,6 +39,14 @@ using System.Text;
 using src.Infrastructure.Broker.Events.DriverCreated.Interfaces;
 using src.Infrastructure.Broker.Events.DriverCreated.Implementations;
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
+using src.Application.Common.CnpjProcessing.Abstractions;
+using src.Application.Common.CnpjProcessing.InMemory;
+using src.Infrastructure.Broker.Events.CnpjRequested.Interfaces;
+using src.Infrastructure.Broker.Events.CnpjRequested.Implementations;
+using src.Application.UseCases.TemporaryData.Interfaces;
+using src.Application.UseCases.TemporaryData.Implementations;
+using src.Infrastructure.Broker.Background;
 
 
 DotNetEnv.Env.Load();
@@ -88,7 +96,21 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console(
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+        theme: AnsiConsoleTheme.Code
+    )
+    .CreateLogger();
+
+Log.Logger = new LoggerConfiguration()
+.MinimumLevel.Debug()
+.WriteTo.Console(
+    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+    theme: AnsiConsoleTheme.Literate
+)
+.CreateLogger();
 
 
 
@@ -110,6 +132,13 @@ builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IEmployeerManagerRepository, EmployeerManagerRepository>();
 builder.Services.AddScoped<IEmployeerManagerService, EmployeerManagerService>();
 builder.Services.AddSingleton<IDriverEventPublisher, DriverEventPublisher>();
+builder.Services.AddSingleton<ISharedCnpjList, HandleSharedCnpjListAsync>(); //rename asap
+builder.Services.AddSingleton<ICnpjRequestedPublisher, CnpjRequestedPublisher>();
+builder.Services.AddScoped<ITransporterTemporaryDataService, TransporterTemporaryDataService>();
+builder.Services.AddScoped<ICnpjRequestedConsumer, CnpjRequestedConsumer>();
+builder.Services.AddSingleton<IHostedService, ServiceBackground>();
+
+
 
 var jwtDurationStr = Environment.GetEnvironmentVariable("JWT_DURATION");
 var jwtDuration = string.IsNullOrEmpty(jwtDurationStr) ? 30 : int.Parse(jwtDurationStr);

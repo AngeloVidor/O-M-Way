@@ -13,6 +13,7 @@ using src.Application.UseCases.CreateTransporter.Interfaces;
 using src.Application.UseCases.GenerateVerificationCode.Interfaces;
 using src.Application.UseCases.SendVerificationCodeToEmail.Interfaces;
 using src.Domain.Entities;
+using src.Infrastructure.Broker.Events.CnpjRequested.Interfaces;
 using src.Infrastructure.Repositories.Interfaces;
 using src.Infrastructure.Repositories.Interfaces.TemporaryData;
 using src.Infrastructure.Repositories.Interfaces.Utility;
@@ -31,8 +32,9 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
         private readonly ITransporterTemporaryDataRepository _transporterTemporaryDataRepository;
         private readonly IUtilityRepository _utilityRepository;
         private readonly ILogger<TransporterService> _logger;
+        private readonly ICnpjRequestedPublisher _cnpjRequestedPublisher;
 
-        public TransporterService(IMapper mapper, ITransporterRepository transporterRepository, IVerificationCodeHandler verificationCode, ISendVerificationCodeToEmailService sendVerificationCodeToEmailService, IZipCodeValidityCheckerService zipCodeValidityCheckerService, IConsultCnpjService consultCnpjService, ITransporterTemporaryDataRepository transporterTemporaryDataRepository, IUtilityRepository utilityRepository, ILogger<TransporterService> logger)
+        public TransporterService(IMapper mapper, ITransporterRepository transporterRepository, IVerificationCodeHandler verificationCode, ISendVerificationCodeToEmailService sendVerificationCodeToEmailService, IZipCodeValidityCheckerService zipCodeValidityCheckerService, IConsultCnpjService consultCnpjService, ITransporterTemporaryDataRepository transporterTemporaryDataRepository, IUtilityRepository utilityRepository, ILogger<TransporterService> logger, ICnpjRequestedPublisher cnpjRequestedPublisher)
         {
             _mapper = mapper;
             _transporterRepository = transporterRepository;
@@ -43,35 +45,53 @@ namespace src.Application.UseCases.CreateTransporter.Implementations
             _transporterTemporaryDataRepository = transporterTemporaryDataRepository;
             _utilityRepository = utilityRepository;
             _logger = logger;
+            _cnpjRequestedPublisher = cnpjRequestedPublisher;
         }
 
         public async Task<PendingRegistration> StartRegistrationAsync(PendingRegistration pendingRegistration)
         {
-            _logger.LogInformation("Calling repository to check if email is registered: {Email}", pendingRegistration.Email);
+
             var isEmailRegistered = await _utilityRepository.IsEmailRegisteredAsync(pendingRegistration.Email);
-            if (!isEmailRegistered) throw new InvalidOperationException("The provided email is already registered.");
+            if (!isEmailRegistered)
+            {
+                _logger.LogError("Email is already registered: {Email}", pendingRegistration.Email);
+                throw new InvalidOperationException("The provided email is already registered.");
+            }
 
-            _logger.LogInformation("Calling CNPJ service to validate CNPJ: {CNPJ}", pendingRegistration.CNPJ);
-            bool isValidCnpj = await _consultCnpjService.IsCnpjValidAsync(pendingRegistration.CNPJ);
-            _logger.LogInformation("CNPJ validation response for {CNPJ}: {IsValidCnpj}", pendingRegistration.CNPJ, isValidCnpj);
-            if (!isValidCnpj) throw new ArgumentException("Invalid or inactive CNPJ. It must contain exactly 14 digits.");
+            //bool isValidCnpj = await _consultCnpjService.IsCnpjValidAsync(pendingRegistration.CNPJ);
+            //if (!isValidCnpj)
+            //{
+            //    _logger.LogError("Invalid or inactive CNPJ: {CNPJ}", pendingRegistration.CNPJ);
+            //    throw new ArgumentException("Invalid or inactive CNPJ. It must contain exactly 14 digits.");
+            //}
 
-            _logger.LogInformation("Calling ThirdParty API to validate zip code: {ZipCode}", pendingRegistration.Location.CEP);
             bool isValidZipCode = await _zipCodeValidityCheckerService.IsValidZipCodeAsync(pendingRegistration.Location.CEP);
-            if (!isValidZipCode) throw new ArgumentException("Invalid zip code. It must contain exactly 8 digits without the hyphen.");
-            _logger.LogInformation("Zip code validation response for {ZipCode}: {IsValidZipCode}", pendingRegistration.Location.CEP, isValidZipCode);
+            if (!isValidZipCode)
+            {
+                _logger.LogError("Invalid zip code: {ZipCode}", pendingRegistration.Location.CEP);
+                throw new ArgumentException("Invalid zip code. It must contain exactly 8 digits without the hyphen.");
+            }
 
-            _logger.LogInformation("Calling service to generate verification code for email: {Email}", pendingRegistration.Email);
-            var response = await _verificationCode.GenerateCodeAsync(pendingRegistration.Email);
-            pendingRegistration.VerificationCode = response.Code;
+            // var response = await _verificationCode.GenerateCodeAsync(pendingRegistration.Email);
+            // pendingRegistration.VerificationCode = response.Code;
 
-            _logger.LogInformation("Calling SMTP service to send verification code to email: {Email}", pendingRegistration.Email);
-            await _sendVerificationCodeToEmailService.SentAsync(pendingRegistration.Email, response.Code, response.CreatedAt, response.ExpirationDate);
+            // _logger.LogWarning("Sending verification code to email: {Email}", pendingRegistration.Email);
+            // await _sendVerificationCodeToEmailService.SentAsync(
+            //     pendingRegistration.Email,
+            //     response.Code,
+            //     response.CreatedAt,
+            //     response.ExpirationDate
+            // );
 
             pendingRegistration.Password = BCrypt.Net.BCrypt.HashPassword(pendingRegistration.Password);
 
-            _logger.LogInformation("Calling repository to add temporary data for email: {Email}", pendingRegistration.Email);
+            //o PendingRegistration é usado pra salvar no banco para trabalhar na fase de validação do código de verificação
             var temporaryData = await _transporterTemporaryDataRepository.AddTemporaryDataAsync(pendingRegistration);
+            //precisa atualizar a {temporaryData.PendingTransporter_ID} depois de salvar no banco, pq o ID é gerado lá
+            await _cnpjRequestedPublisher.Publish(temporaryData.PendingTransporter_ID, temporaryData.CNPJ, temporaryData.Email);
+
+            _logger.LogInformation("Pre-registration process completed successfully for: {Email}", pendingRegistration.Email);
+
             return temporaryData;
         }
 
